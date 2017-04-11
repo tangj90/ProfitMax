@@ -1,5 +1,13 @@
-// ProfitMax.cpp : Defines the entry point for the console application.
-//
+/**
+* @file ProfitMax.cpp
+* @brief This project is used to demonstrate the experiments for the below paper:
+* Jing Tang, Xueyan Tang, Junsong Yuan, "Profit Maximization for Viral Marketing in Online Social Networks," in Proc. IEEE ICNP 2016.
+*
+* @author Jing Tang (Nanyang Technological University)
+* 
+* Copyright (C) 2017 Jing Tang and Nanyang Technological University. All rights reserved.
+*
+*/
 
 #include "stdafx.h"
 
