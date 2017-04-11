@@ -3,6 +3,7 @@
 class IOcontroller
 {
 public:
+	/// Save a serialized file
 	template <class T>
 	static void save_file(std::string filename, const T& output)
 	{
@@ -23,6 +24,7 @@ public:
 		}
 	}
 
+	/// Load a serialized file
 	template <class T>
 	static void load_file(std::string filename, T& input)
 	{
@@ -47,6 +49,7 @@ public:
 		}
 	}
 
+	/// Save graph structure to a file
 	static void IOcontroller::save_graph_struct(std::string graphName, const Graph& vecGraph, const bool isReverse)
 	{
 		std::string postfix = ".vec.graph";
@@ -55,6 +58,7 @@ public:
 		save_file(filename, vecGraph);
 	}
 
+	/// Load graph structure from a file
 	static void IOcontroller::load_graph_struct(std::string graphName, Graph& vecGraph, const bool isReverse)
 	{
 		std::string postfix = ".vec.graph";
@@ -63,6 +67,7 @@ public:
 		load_file(filename, vecGraph);
 	}
 
+	/// Load cost of each node from a file
 	static double* IOcontroller::read_cost(std::string graphName, int numV, std::string costType, double scale, double base)
 	{
 		std::string fullName = graphName + "." + costType + ".cost";
@@ -89,6 +94,7 @@ public:
 		return cost;
 	}
 
+	/// Get out-file name
 	static std::string IOcontroller::get_out_file_name(std::string graphName, std::string costType, std::string algName, double scale, double para)
 	{
 		std::ostringstream strs1, strs2;
@@ -99,6 +105,7 @@ public:
 		return graphName + "_" + algName + "_" + costType + "_s" + strScale + "_b" + strPara;
 	}
 
+	/// Print the results
 	static void IOcontroller::write_result(std::string outFileName, PResult resultObj, std::string outFolder)
 	{
 		double runTime = resultObj->get_running_time();
@@ -144,6 +151,7 @@ public:
 		}
 	}
 
+	/// Print the seeds
 	static void IOcontroller::write_order_seeds(std::string outFileName, PResult resultObj, std::string outFolder)
 	{
 		CreateDirectoryA(outFolder.c_str(), nullptr);

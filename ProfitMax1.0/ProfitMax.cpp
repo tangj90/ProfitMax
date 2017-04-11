@@ -3,7 +3,6 @@
 
 #include "stdafx.h"
 
-
 int main(int argc, char* argv[])
 {
 	// Randomize the seed for generating random numbers
@@ -51,7 +50,7 @@ int main(int argc, char* argv[])
 	pHyperG->set_hyper_graph_mode(true);
 	TAlg tAlg(pCost, pHyperG, pResult);
 	std::cout << "  ==>Graph loaded for RIS! total time used (sec): " + std::to_string(mainTimer.get_total_time()) << std::endl;
-	pHyperG->reflesh_hypergraph();
+	pHyperG->refresh_hypergraph();
 	dsfmt_gv_init_gen_rand(0);
 
 	switch (tolower(Arg._algName[0]))

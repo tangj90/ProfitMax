@@ -24,7 +24,6 @@ void Heap::insert(NodeEleType X, PriorityQueue H)
 	H->Elements[i] = X;
 }
 
-
 NodeEleType Heap::delete_max(PriorityQueue H)
 {
 	int i, Child;
@@ -50,12 +49,10 @@ NodeEleType Heap::delete_max(PriorityQueue H)
 	return MaxElement;
 }
 
-
 void Heap::make_empty(PriorityQueue H)
 {
 	H->Size = 0;
 }
-
 
 NodeEleType Heap::find_max(PriorityQueue H)
 {
@@ -64,25 +61,21 @@ NodeEleType Heap::find_max(PriorityQueue H)
 	return H->Elements[0];
 }
 
-
 int Heap::is_empty(PriorityQueue H)
 {
 	return H->Size == 0;
 }
-
 
 int Heap::is_full(PriorityQueue H)
 {
 	return H->Size == H->Capacity;
 }
 
-
 void Heap::destroy(PriorityQueue H)
 {
 	free(H->Elements);
 	free(H);
 }
-
 
 void Heap::replace_value(int nodeId, double newValue, PriorityQueue H)
 {
@@ -129,7 +122,6 @@ void Heap::replace_value(int nodeId, double newValue, PriorityQueue H)
 	}
 }
 
-
 void Heap::print(PriorityQueue H)
 {
 	printf("Heap: ");
@@ -138,13 +130,11 @@ void Heap::print(PriorityQueue H)
 	printf("\n");
 }
 
-
 void Heap::min_heap_insert(NodeEleType X, PriorityQueue H)
 {
 	X.value = -X.value;
 	Heap::insert(X, H);
 }
-
 
 NodeEleType Heap::delete_min(PriorityQueue H)
 {
@@ -152,7 +142,6 @@ NodeEleType Heap::delete_min(PriorityQueue H)
 	X.value = -X.value;
 	return X;
 }
-
 
 NodeEleType Heap::find_min(PriorityQueue H)
 {

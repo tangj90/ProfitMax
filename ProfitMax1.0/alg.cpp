@@ -2,7 +2,7 @@
 #include "alg.h"
 
 
-void Alg::reflesh_params()
+void Alg::refresh_params()
 {
 	__vecSeed.clear();
 	__vecLowerLattice.clear();
@@ -294,9 +294,9 @@ double Alg::IMM_step2(int targetSize, double epsilon, int order, double OPTprime
 }
 
 
-void Alg::build_n_RRsets(int64 numHyperE)
+void Alg::build_n_RRsets(int64 numRRsets)
 {
-	__pHyperG->build_n_RRsets(numHyperE);
+	__pHyperG->build_n_RRsets(numRRsets);
 	__numRRsets = __pHyperG->get_RRsets_size();
 }
 
@@ -379,7 +379,7 @@ double Alg::top_k_seed_heap(int targetSize)
 
 void Alg::simple_greedy(bool isPerfectPrune)
 {
-	reflesh_params();
+	refresh_params();
 	double sumCost = 0, sumProfit = 0, incProfit;
 	std::vector<int> vecSeed;
 	std::vector<double> profitVec(__numV);
@@ -418,7 +418,7 @@ void Alg::simple_greedy(bool isPerfectPrune)
 
 void Alg::simple_greedy_heap(bool isPerfectPrune)
 {
-	reflesh_params();
+	refresh_params();
 	int *comp, roundIndex = 0;
 	double sumCost = 0, sumProfit = 0, incProfit;
 	comp = (int *)calloc(__numV, sizeof(int));
@@ -487,7 +487,7 @@ void Alg::simple_greedy_heap(bool isPerfectPrune)
 
 void Alg::double_greedy(bool isPerfectPrune, bool isDeter)
 {
-	reflesh_params();
+	refresh_params();
 	int nodeId;
 	double sumCostS = 0, sumProfitS, incProfitS, sumCostT = 0, sumProfitT, incProfitT, prob;
 	bool cond;
@@ -577,14 +577,6 @@ void Alg::upper_bound()
 {
 	supergradient1();
 	supergradient2();
-}
-
-
-std::vector<int> Alg::get_non_selected_nodes()
-{
-	std::vector<int> vecResult(__vecExtraLatticeEle.size());
-	for (int idx = 0; idx < vecResult.size(); idx++) vecResult[idx] = __vecExtraLatticeEle[idx].id;
-	return vecResult;
 }
 
 
@@ -916,7 +908,7 @@ void Alg::baseline_infmax(const double epsilon, const int order, const bool isUn
 		}
 		auto numRR = __pHyperG->get_RRsets_size();
 		maxRR = max(maxRR, (int)numRR);
-		__pHyperG->reflesh_hypergraph();
+		__pHyperG->refresh_hypergraph();
 	}
 	__pRes->set_running_time(timerIM.get_total_time());
 	__pRes->set_profit(maxProfit);

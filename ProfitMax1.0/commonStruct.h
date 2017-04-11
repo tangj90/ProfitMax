@@ -8,13 +8,13 @@ typedef std::vector<Edge> Edgelist;
 typedef std::vector<Edgelist> Graph;
 /// RR sets
 typedef std::vector<std::vector<int>> RRsets;
-
+/// Node element with id and a property value
 typedef struct NodeElement
 {
 	int id;
 	double value;
 } NodeEleType;
-
+/// Smaller operation for node element
 struct smaller
 {
 	bool operator()(const NodeEleType& Ele1, const NodeEleType& Ele2) const
@@ -22,7 +22,7 @@ struct smaller
 		return (Ele1.value < Ele2.value);
 	}
 };
-
+/// Greater operation for node element
 struct greater
 {
 	bool operator()(const NodeEleType& Ele1, const NodeEleType& Ele2) const

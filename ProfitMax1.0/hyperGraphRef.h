@@ -15,6 +15,7 @@ private:
 	const double* __pAccumWeight;
 	bool __isBilateral = false;
 
+	/// Initialization
 	void init_hypergraph()
 	{
 		__numV = static_cast<int>(_vecGRev.size());
@@ -48,11 +49,13 @@ public:
 		init_hypergraph();
 	}
 
+	/// Set cascade model
 	void set_cascade_model(CascadeModel model)
 	{
 		_cascadeModel = model;
 	}
 
+	/// Set RR sets model
 	void set_hyper_graph_mode(bool val)
 	{
 		__isBilateral = val;
@@ -90,6 +93,7 @@ public:
 		return outDeg;
 	}
 
+	/// Generate a set of n RR sets
 	void build_n_RRsets(const int64 numSamples)
 	{
 		if (numSamples > INT_MAX)
@@ -105,10 +109,9 @@ public:
 		}
 	}
 
-
+	/// Generate one RR set
 	void build_one_RRset(const int uStart, const int hyperIdx)
 	{
-		//LogInfo(uStart);
 		int numVisitNode = 0;
 		__que.clear();
 		__que.push_back(uStart);
@@ -145,7 +148,6 @@ public:
 					continue;
 				assert(_vecGRev[expand].size() > 0);
 				int nextNbrIdx = gen_random_node_by_weight_LT(_vecGRev[expand]);
-				//LogInfo(nextNbrIdx);
 				if (nextNbrIdx < 0) break; // No element activated
 				int nbrId = _vecGRev[expand][nextNbrIdx].first;
 				if (__vecVisitBool[nbrId]) break; // Stop, no further node activated
@@ -157,11 +159,10 @@ public:
 			}
 		}
 		for (int i = 0; i < numVisitNode; i++) __vecVisitBool[__vecVisitNode[i]] = false;
-		//LogInfo(numVisitNode);
 		if (__isBilateral) _vecRRsetsRev.push_back(std::vector<int>(__vecVisitNode.begin(), __vecVisitNode.begin() + numVisitNode));
 	}
 
-
+	/// Evaluate the influence spread of a seed set on current generated RR sets
 	double eval_inf_spread(const std::vector<int>& vecSeed)
 	{
 		std::vector<bool> vecBoolVst;
@@ -180,7 +181,7 @@ public:
 		return inf;
 	}
 
-
+	/// Efficiently estimate the influence spread with sampling error epsilon within probability 1-delta
 	double effic_inf_valid_algo(std::vector<int>& vecSeed, double delta = 1e-6, double eps = 0.01)
 	{
 		double c = 2 * (exp(1) - 2);
@@ -255,7 +256,7 @@ public:
 		return inf;
 	}
 
-
+	/// Efficiently evaluate the influence spread of a seed set with a given number of RR sets to test
 	double inf_valid_algo(std::vector<int>& vecSeed, int numSamples)
 	{
 		int numHyperEdge = 0;
@@ -326,8 +327,8 @@ public:
 		return inf;
 	}
 
-
-	void reflesh_hypergraph()
+	/// Refresh the hypergraph
+	void refresh_hypergraph()
 	{
 		if (__isBilateral)
 		{
@@ -344,10 +345,10 @@ public:
 		__numRRsets = 0;
 	}
 
-
+	/// Release memory
 	void release_memory()
 	{
-		reflesh_hypergraph();
+		refresh_hypergraph();
 		if (__isBilateral)
 		{
 			std::vector<std::vector<int>>().swap(_vecRRsetsRev);

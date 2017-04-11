@@ -7,23 +7,26 @@ static inline void LogInfo(_Ty val)
 	std::cout << val << std::endl;
 }
 
+/// Log information
 template <typename _Ty>
 static inline void LogInfo(std::string title, _Ty val)
 {
 	std::cout << title << ": " << val << std::endl;
 }
 
-/// Math
+/// Math, pow2
 static inline double pow2(double t)
 {
 	return t * t;
 }
 
+/// Math, log2
 static inline double log2(int n)
 {
 	return log(n) / log(2);
 }
 
+/// Math, logcnk
 static inline double logcnk(int n, int k)
 {
 	k = min(k, n - k);
@@ -32,6 +35,7 @@ static inline double logcnk(int n, int k)
 	return res;
 }
 
+/// Generate one node with probabilities according to their weights
 static inline int gen_random_node_by_weight(const int numV, const double* pAccumWeight = nullptr)
 {
 	if (pAccumWeight == nullptr) return dsfmt_gv_genrand_uint32_range(numV);
@@ -48,7 +52,7 @@ static inline int gen_random_node_by_weight(const int numV, const double* pAccum
 	return maxIdx;
 }
 
-///For LT method
+/// Generate one node with probabilities according to their weights for the LT cascade model
 static inline int gen_random_node_by_weight_LT(const Edgelist& edges)
 {
 	double weight = dsfmt_gv_genrand_open_close();
@@ -65,6 +69,7 @@ static inline int gen_random_node_by_weight_LT(const Edgelist& edges)
 	return maxIdx;
 }
 
+/// Normalize the probabilities to a accumulative format, e.g., [0.2, 0.5, 0.3]->[0.2, 0.7, 1.0]
 static inline void to_normal_accum_prob(Graph& vecGraph)
 {
 	for (auto& nbrs : vecGraph)
@@ -83,6 +88,7 @@ static inline void to_normal_accum_prob(Graph& vecGraph)
 	}
 }
 
+/// Normalize the weights to a accumulative format, e.g., [0.2, 0.5, 0.3]->[0.2, 0.7, 1.0]
 static inline double to_normal_accum_weight(double* pWeight, int numV)
 {
 	double accumVal = 0;

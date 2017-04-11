@@ -19,11 +19,7 @@ public:
 		}
 	}
 
-	/// filename: full path
-	/// mode: three letters
-	/// e: edge file (default), a: adjacent vector,
-	/// g: graph only (default, WC cascade model), w: with edge property,
-	/// r: reverse (default), f: forward, b: bilateral
+	/// Format the input for future computing, which is much faster for loading. Vector serialization is used.
 	static void format_graph(const std::string filename, const std::string mode)
 	{
 		char m0 = tolower(mode[0]), m1 = tolower(mode[1]), m2 = tolower(mode[2]);
@@ -122,7 +118,7 @@ public:
 		std::cout << "The graph is formatted!" << std::endl;
 	}
 
-
+	/// Load graph via vector deserialization.
 	static Graph load_graph(const std::string graphName, const bool isReverse, const std::string probDist = "load")
 	{
 		Graph graph;

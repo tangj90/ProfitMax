@@ -6,9 +6,13 @@ class Argument
 public:
 	int _func = 1;
 	std::string _graphname = "facebook"; // Graph name. Default is "facebook".
-	std::string _mode = "egr"; // three letters, 1 -> e: edge file (default), a: adjacent vector, 
-	// 2 -> graph only (default, WC cascade model), w: with edge property,
-	// 3 -> r: reverse (default), f: forward, b: bilateral
+	/*
+	 * three letters: 
+	 * 1 -> e: edge file (default), a: adjacent vector,
+	 * 2 -> graph only (default, WC cascade model), w: with edge property,
+	 * 3 -> r: reverse (default), f: forward, b: bilateral
+	 */
+	std::string _mode = "egr";
 	std::string _dir = "graphInfo"; // Directory
 	std::string _outFileName; // File name of the result
 	std::string _resultFolder = "result"; // Result folder. Default is "test".
