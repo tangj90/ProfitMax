@@ -158,7 +158,6 @@
     <ClCompile Include="..\SFMT\dSFMT\dSFMT.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="heap.cpp" />
     <ClCompile Include="ProfitMax.cpp" />
     <ClCompile Include="alg.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -167,7 +166,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="timer.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

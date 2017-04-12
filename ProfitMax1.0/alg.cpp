@@ -17,10 +17,10 @@ void Alg::simple_prune()
 	double incProfit;
 	NodeEleType nodeEle;
 	for (int i = 0; i < __numV; i++)
-	{
-		incProfit = (int)__pHyperG->_vecRRsets[i].size() - __pCost[i] * __numRRsets / __numV;
+	{// Compute the maximum possible marginal profit of each node
+		incProfit = (int)__pHyperG->_vecCover[i].size() - __pCost[i] * __numRRsets / __numV;
 		if (incProfit > 0)
-		{
+		{// Add the node to a max-heap if its maximum possible profit is positive
 			nodeEle.id = i;
 			nodeEle.value = incProfit;
 			__vecExtraLatticeEle.push_back(nodeEle);
@@ -35,8 +35,8 @@ void Alg::iter_prune(std::vector<bool>& vecBoolVst, std::vector<int>& vecIntVst)
 {
 	simple_prune();
 	for (auto iter : __vecExtraLatticeEle)
-	{
-		for (auto idx : __pHyperG->_vecRRsets[iter.id])
+	{// Compute the coverage of each node
+		for (auto idx : __pHyperG->_vecCover[iter.id])
 		{
 			++vecIntVst[idx];
 		}
@@ -52,20 +52,20 @@ void Alg::iter_prune(std::vector<bool>& vecBoolVst, std::vector<int>& vecIntVst)
 	while (flagS || flagT)
 	{
 		if (flagS)
-		{
+		{// Based on A, compute B
 			flagS = false;
 			__vecExtraLatticeEle.clear();
 			for (auto iter : vecNodeEleTmp)
-			{
+			{// Use f(v|A) as an upper bound since f(v|A)>=f(v|S)
 				nodeId = iter.id;
 				incProfit = -__pCost[nodeId] * __numRRsets / __numV;
-				for (auto idx : __pHyperG->_vecRRsets[nodeId])
+				for (auto idx : __pHyperG->_vecCover[nodeId])
 				{
 					if (!vecBoolVst[idx]) incProfit++;
 				}
 				if (incProfit <= 0)
 				{
-					for (auto idx : __pHyperG->_vecRRsets[nodeId]) --vecIntVst[idx];
+					for (auto idx : __pHyperG->_vecCover[nodeId]) --vecIntVst[idx];
 					flagT = true;
 				}
 				else
@@ -79,21 +79,21 @@ void Alg::iter_prune(std::vector<bool>& vecBoolVst, std::vector<int>& vecIntVst)
 			if (isLog) std::cout << "  ---Remove non-optimal, before: " << vecNodeEleTmp.size() << ", after: " << __vecExtraLatticeEle.size() << std::endl;
 		}
 		if (flagT)
-		{
+		{// Based on B, compute A
 			flagT = false;
 			vecNodeEleTmp.clear();
 			for (auto iter : __vecExtraLatticeEle)
-			{
+			{// Use f(v|B) as a lower bound since f(v|B)<=f(v|S)
 				nodeId = iter.id;
 				incProfit = __pCost[nodeId] * __numRRsets / __numV;
-				for (auto idx : __pHyperG->_vecRRsets[nodeId])
+				for (auto idx : __pHyperG->_vecCover[nodeId])
 				{
 					if (vecIntVst[idx] == 1) incProfit--;
 				}
 				if (incProfit <= 0)
 				{
 					__vecSeed.push_back(nodeId);
-					for (auto idx : __pHyperG->_vecRRsets[nodeId]) vecBoolVst[idx] = true;
+					for (auto idx : __pHyperG->_vecCover[nodeId]) vecBoolVst[idx] = true;
 					flagS = true;
 				}
 				else
@@ -107,7 +107,7 @@ void Alg::iter_prune(std::vector<bool>& vecBoolVst, std::vector<int>& vecIntVst)
 			if (isLog) std::cout << "  +++Add to optimal, before: " << __vecExtraLatticeEle.size() << ", after: " << vecNodeEleTmp.size() << std::endl;
 		}
 	}
-	// Storing profit of A+ and B+ after prune
+	// Saving profit of A* and B* after pruning
 	double sumProfit, totalCost = 0;
 	for (auto seed : __vecSeed) totalCost += __pCost[seed];
 	sumProfit = (double)count(vecBoolVst.begin(), vecBoolVst.end(), true) * __numV / __numRRsets - totalCost;
@@ -115,8 +115,7 @@ void Alg::iter_prune(std::vector<bool>& vecBoolVst, std::vector<int>& vecIntVst)
 	for (auto validNodeEle : __vecExtraLatticeEle) totalCost += __pCost[validNodeEle.id];
 	sumProfit = __numV - (double)count(vecIntVst.begin(), vecIntVst.end(), 0) * __numV / __numRRsets - totalCost;
 	__pRes->set_profit_upper_lattice(sumProfit);
-
-	// Storing two upper bounds, mu(A*) and mu(B*)
+	// Saving two upper bounds, mu(A*) and mu(B*)
 	double upperBound = __pRes->get_profit_lower_lattice();
 	__vecSearchLattice.clear();
 	for (auto node : __vecExtraLatticeEle)
@@ -128,7 +127,7 @@ void Alg::iter_prune(std::vector<bool>& vecBoolVst, std::vector<int>& vecIntVst)
 	upperBound = __pRes->get_profit_upper_lattice();
 	for (auto node : vecNodeEleTmp) upperBound += node.value * __numV / __numRRsets;
 	__pRes->set_profit_bound_idx(upperBound, 1);
-	// Storing A+ and B+
+	// Saving A* and B*
 	__pRes->set_lower_lattice_vec(__vecSeed);
 	__pRes->set_search_lattice_vec(__vecSearchLattice);
 	std::vector<NodeEleType>().swap(vecNodeEleTmp);
@@ -140,8 +139,8 @@ void Alg::build_heap(PriorityQueue profitHeap) const
 	double incProfit;
 	NodeEleType nodeEle;
 	for (int i = 0; i < __numV; i++)
-	{
-		incProfit = (int)__pHyperG->_vecRRsets[i].size() - __pCost[i] * __numRRsets / __numV;
+	{// Build a heap according to each node's marginal profit
+		incProfit = (int)__pHyperG->_vecCover[i].size() - __pCost[i] * __numRRsets / __numV;
 		if (incProfit > 0)
 		{
 			nodeEle.id = i;
@@ -153,12 +152,12 @@ void Alg::build_heap(PriorityQueue profitHeap) const
 
 
 void Alg::subgradient()
-{
+{// The node sequence is ordered by seeds priori to non-seeds
 	std::vector<bool> vecBoolVst(__numRRsets);
 	for (auto& nodeEle : __vecSeedEle)
-	{
+	{// Compute the marginal profits for every seed
 		nodeEle.value = -__pCost[nodeEle.id] * __numRRsets / __numV;
-		for (auto nbr : __pHyperG->_vecRRsets[nodeEle.id])
+		for (auto nbr : __pHyperG->_vecCover[nodeEle.id])
 		{
 			if (vecBoolVst[nbr]) continue;
 			nodeEle.value++;
@@ -166,9 +165,9 @@ void Alg::subgradient()
 		}
 	}
 	for (auto& nodeEle : __vecExtraLatticeEle)
-	{
+	{// Compute the marginal profits for every non-seed
 		nodeEle.value = -__pCost[nodeEle.id] * __numRRsets / __numV;
-		for (auto nbr : __pHyperG->_vecRRsets[nodeEle.id])
+		for (auto nbr : __pHyperG->_vecCover[nodeEle.id])
 		{
 			if (vecBoolVst[nbr]) continue;
 			nodeEle.value++;
@@ -185,7 +184,7 @@ void Alg::supergradient1()
 	// initialize
 	for (auto seed : __vecSeed)
 	{
-		for (auto idx : __pHyperG->_vecRRsets[seed])
+		for (auto idx : __pHyperG->_vecCover[seed])
 		{
 			vecBoolVst[idx] = true;
 			++vecIntVst[idx];
@@ -193,14 +192,14 @@ void Alg::supergradient1()
 	}
 	for (auto iter : __vecExtraLatticeEle)
 	{
-		for (auto idx : __pHyperG->_vecRRsets[iter.id]) ++vecIntVst[idx];
+		for (auto idx : __pHyperG->_vecCover[iter.id]) ++vecIntVst[idx];
 	}
 	// find the upper bound
 	double incProfit, maxBound = 0;
 	for (auto seed : __vecSeed)
 	{
 		incProfit = __pCost[seed] * __numRRsets / __numV;
-		for (auto idx : __pHyperG->_vecRRsets[seed])
+		for (auto idx : __pHyperG->_vecCover[seed])
 		{
 			if (vecIntVst[idx] == 1) incProfit--;
 		}
@@ -209,7 +208,7 @@ void Alg::supergradient1()
 	for (auto iter : __vecExtraLatticeEle)
 	{
 		incProfit = -__pCost[iter.id] * __numRRsets / __numV;
-		for (auto idx : __pHyperG->_vecRRsets[iter.id])
+		for (auto idx : __pHyperG->_vecCover[iter.id])
 		{
 			if (!vecBoolVst[idx]) incProfit++;
 		}
@@ -228,18 +227,18 @@ void Alg::supergradient2()
 	// initialize
 	for (auto seed : __pRes->get_lower_lattice_vec())
 	{
-		for (auto idx : __pHyperG->_vecRRsets[seed]) vecBoolVst[idx] = true;
+		for (auto idx : __pHyperG->_vecCover[seed]) vecBoolVst[idx] = true;
 	}
 	for (auto seed : __vecSeed)
 	{
-		for (auto idx : __pHyperG->_vecRRsets[seed]) ++vecIntVst[idx];
+		for (auto idx : __pHyperG->_vecCover[seed]) ++vecIntVst[idx];
 	}
 	// find the upper bound
 	double incProfit, maxBound = 0;
 	for (auto seed : __vecSeed)
 	{
 		incProfit = __pCost[seed] * __numRRsets / __numV;;
-		for (auto idx : __pHyperG->_vecRRsets[seed])
+		for (auto idx : __pHyperG->_vecCover[seed])
 		{
 			if (vecIntVst[idx] == 1) incProfit--;
 		}
@@ -248,7 +247,7 @@ void Alg::supergradient2()
 	for (auto iter : __vecExtraLatticeEle)
 	{
 		incProfit = -__pCost[iter.id] * __numRRsets / __numV;;
-		for (auto idx : __pHyperG->_vecRRsets[iter.id])
+		for (auto idx : __pHyperG->_vecCover[iter.id])
 		{
 			if (!vecBoolVst[idx]) incProfit++;
 		}
@@ -273,7 +272,7 @@ double Alg::IMM_step1(int targetSize, double epsilon, int order)
 		__numRRsets = __pHyperG->get_RRsets_size();
 		double ept = top_k_seed_heap(targetSize);
 		if (ept >= (1 + epsilonPrime) * threshold)
-		{
+		{// Return OPTprime=ept/(1+epsilonPrime) as a lower bound of the optimum with high probability
 			double OPTprime = ept / (1 + epsilonPrime);
 			return OPTprime;
 		}
@@ -308,23 +307,23 @@ double Alg::top_k_seed(int targetSize)
 	__vecSeed.clear();
 	for (int i = 0; i < __numV; i++)
 	{
-		degree.push_back((int)__pHyperG->_vecRRsets[i].size());
+		degree.push_back((int)__pHyperG->_vecCover[i].size());
 	}
 	std::vector<int> vecMargin(targetSize);
 	int sumInf = 0;
 	for (int i = 0; i < targetSize; i++)
-	{
+	{// Find the largest marginal influence gain and remove the corresponding hyper-edge
 		auto t = max_element(degree.begin(), degree.end());
 		int id = int(t - degree.begin());
 		sumInf += degree[id];
 		__vecSeed.push_back(id);
 		degree[id] = -1;
-		for (int i1 : __pHyperG->_vecRRsets[id])
+		for (int i1 : __pHyperG->_vecCover[id])
 		{
 			if (!visitLocal[i1])
 			{
 				visitLocal[i1] = true;
-				for (int node : __pHyperG->_vecRRsetsRev[i1])
+				for (int node : __pHyperG->_vecCoverRev[i1])
 				{
 					degree[node]--;
 				}
@@ -342,7 +341,7 @@ double Alg::top_k_seed_heap(int targetSize)
 	for (int i = 0; i < __numV; i++)
 	{
 		nodeEle.id = i;
-		nodeEle.value = (int)__pHyperG->_vecRRsets[i].size();
+		nodeEle.value = (int)__pHyperG->_vecCover[i].size();
 		Heap::insert(nodeEle, infHeap);
 	}
 	int roundIndex = 0;
@@ -351,19 +350,19 @@ double Alg::top_k_seed_heap(int targetSize)
 	double incInf, sumInf = 0;
 	__vecSeed.clear();
 	while (roundIndex < targetSize)
-	{
+	{// Find the largest marginal influence gain and recompute the out-date information using lazy forward approach
 		nodeEle = Heap::delete_max(infHeap);
 		if (comp[nodeEle.id] == roundIndex)
 		{
 			__vecSeed.push_back(nodeEle.id);
 			sumInf += nodeEle.value;
 			roundIndex++;
-			for (auto idx : __pHyperG->_vecRRsets[nodeEle.id]) vecBoolVst[idx] = true;
+			for (auto idx : __pHyperG->_vecCover[nodeEle.id]) vecBoolVst[idx] = true;
 		}
 		else
 		{
 			incInf = 0;
-			for (auto idx : __pHyperG->_vecRRsets[nodeEle.id])
+			for (auto idx : __pHyperG->_vecCover[nodeEle.id])
 			{
 				if (!vecBoolVst[idx]) incInf++;
 			}
@@ -386,11 +385,11 @@ void Alg::simple_greedy(bool isPerfectPrune)
 	std::vector<bool> visit_local(__numRRsets);
 	for (int i = 0; i < __numV; i++)
 	{
-		profitVec[i] = (int)__pHyperG->_vecRRsets[i].size() - __pCost[i] * __numRRsets / __numV;
+		profitVec[i] = (int)__pHyperG->_vecCover[i].size() - __pCost[i] * __numRRsets / __numV;
 	}
 	__pRes->set_estimated_node_size(__numV);
 	while (true)
-	{
+	{// Find the largest marginal influence gain and remove the corresponding hyper-edge
 		int id = (int)distance(profitVec.begin(), max_element(profitVec.begin(), profitVec.end()));
 		incProfit = profitVec[id];
 		if (incProfit <= 0) break;
@@ -398,12 +397,12 @@ void Alg::simple_greedy(bool isPerfectPrune)
 		sumProfit += incProfit;
 		sumCost += __pCost[id];
 		profitVec[id] = -1;
-		for (auto idx : __pHyperG->_vecRRsets[id])
+		for (auto idx : __pHyperG->_vecCover[id])
 		{
 			if (!visit_local[idx])
 			{
 				visit_local[idx] = true;
-				for (int node : __pHyperG->_vecRRsetsRev[idx])
+				for (int node : __pHyperG->_vecCoverRev[idx])
 				{
 					profitVec[node]--;
 				}
@@ -426,7 +425,7 @@ void Alg::simple_greedy_heap(bool isPerfectPrune)
 	PriorityQueue profitHeap = Heap::initialize_heap(__numV);
 	NodeEleType nodeU;
 	if (isPerfectPrune)
-	{
+	{// Iterative pruning
 		std::vector<int> vecIntVst(__numRRsets);
 		iter_prune(vecBoolVst, vecIntVst);
 		for (auto nodeEle : __vecExtraLatticeEle) Heap::insert(nodeEle, profitHeap);
@@ -443,7 +442,7 @@ void Alg::simple_greedy_heap(bool isPerfectPrune)
 	}
 
 	while (!Heap::is_empty(profitHeap))
-	{
+	{// Find the largest marginal profit gain and recompute the out-date information using lazy forward approach
 		nodeU = Heap::delete_max(profitHeap);
 		if (nodeU.value <= 0)
 		{
@@ -456,14 +455,14 @@ void Alg::simple_greedy_heap(bool isPerfectPrune)
 			sumProfit += nodeU.value;
 			sumCost += __pCost[nodeU.id];
 			roundIndex++;
-			for (auto idx : __pHyperG->_vecRRsets[nodeU.id]) vecBoolVst[idx] = true;
+			for (auto idx : __pHyperG->_vecCover[nodeU.id]) vecBoolVst[idx] = true;
 			__vecSeedEle.push_back(nodeU);
 		}
 		else
 		{
 			__pRes->inc_estimated_node_size(1);
 			incProfit = -__pCost[nodeU.id] * __numRRsets / __numV;
-			for (auto idx : __pHyperG->_vecRRsets[nodeU.id])
+			for (auto idx : __pHyperG->_vecCover[nodeU.id])
 			{
 				if (!vecBoolVst[idx]) incProfit++;
 			}
@@ -495,7 +494,7 @@ void Alg::double_greedy(bool isPerfectPrune, bool isDeter)
 	std::vector<int> vecIntVst(__numRRsets);
 	std::vector<NodeEleType> profitVec;
 	if (isPerfectPrune)
-	{
+	{// Iterative pruning
 		iter_prune(vecBoolVst, vecIntVst);
 		sumProfitS = __pRes->get_profit_lower_lattice() * __numRRsets / __numV;
 		sumProfitT = __pRes->get_profit_upper_lattice();
@@ -504,7 +503,7 @@ void Alg::double_greedy(bool isPerfectPrune, bool isDeter)
 	}
 	else
 	{
-		for (int i = 0; i < __numRRsets; i++) vecIntVst[i] = (int)__pHyperG->_vecRRsetsRev[i].size();
+		for (int i = 0; i < __numRRsets; i++) vecIntVst[i] = (int)__pHyperG->_vecCoverRev[i].size();
 		NodeEleType nodeEle;
 		for (int i = 0; i < __numV; i++)
 		{
@@ -525,9 +524,11 @@ void Alg::double_greedy(bool isPerfectPrune, bool isDeter)
 	for (auto iter : profitVec)
 	{
 		nodeId = iter.id;
+		// Compute f(v|S)
 		incProfitS = -__pCost[nodeId] * __numRRsets / __numV;
+		// Compute -f(v|T\{v})
 		incProfitT = __pCost[nodeId] * __numRRsets / __numV;
-		for (auto idx : __pHyperG->_vecRRsets[nodeId])
+		for (auto idx : __pHyperG->_vecCover[nodeId])
 		{
 			if (!vecBoolVst[idx]) incProfitS++;
 			if (vecIntVst[idx] == 1) incProfitT--;
@@ -551,17 +552,17 @@ void Alg::double_greedy(bool isPerfectPrune, bool isDeter)
 			cond = dsfmt_gv_genrand_open_close() <= prob;
 		}
 		if (cond)
-		{
+		{// Add the node to S
 			sumProfitS += incProfitS;
 			sumCostS += __pCost[nodeId];
 			__vecSeed.push_back(nodeId);
-			for (auto idx : __pHyperG->_vecRRsets[nodeId]) vecBoolVst[idx] = true;
+			for (auto idx : __pHyperG->_vecCover[nodeId]) vecBoolVst[idx] = true;
 			__vecSeedEle.push_back(iter);
 		}
 		else
-		{
+		{// Remove the node from T
 			sumProfitT += incProfitT;
-			for (auto idx : __pHyperG->_vecRRsets[nodeId]) --vecIntVst[idx];
+			for (auto idx : __pHyperG->_vecCover[nodeId]) --vecIntVst[idx];
 			__vecExtraLatticeEle.push_back(iter);
 		}
 	}
@@ -592,7 +593,7 @@ std::vector<double> Alg::all_upper_bound_B(double* pCost, std::vector<int>& vecN
 	// initialize
 	for (auto seed : __vecSeed)
 	{
-		for (auto idx : __pHyperG->_vecRRsets[seed])
+		for (auto idx : __pHyperG->_vecCover[seed])
 		{
 			vecBoolVst[idx] = true;
 			++vecIntVst[idx];
@@ -600,11 +601,11 @@ std::vector<double> Alg::all_upper_bound_B(double* pCost, std::vector<int>& vecN
 	}
 	for (auto iter : __vecExtraLatticeEle)
 	{
-		for (auto idx : __pHyperG->_vecRRsets[iter.id]) ++vecIntVst[idx];
+		for (auto idx : __pHyperG->_vecCover[iter.id]) ++vecIntVst[idx];
 	}
 	for (auto node : vecNonOptimal)
 	{
-		for (auto idx : __pHyperG->_vecRRsets[node]) ++vecIntVst[idx];
+		for (auto idx : __pHyperG->_vecCover[node]) ++vecIntVst[idx];
 	}
 	// Build the incremental profit to quit from B
 	double incProfit, baseMaxBound = 0;
@@ -612,7 +613,7 @@ std::vector<double> Alg::all_upper_bound_B(double* pCost, std::vector<int>& vecN
 	for (auto node : __vecSeed)
 	{
 		incProfit = pCost[node] * __numRRsets / __numV;
-		for (auto idx : __pHyperG->_vecRRsets[node])
+		for (auto idx : __pHyperG->_vecCover[node])
 		{
 			if (vecIntVst[idx] == 1) incProfit--;
 		}
@@ -622,7 +623,7 @@ std::vector<double> Alg::all_upper_bound_B(double* pCost, std::vector<int>& vecN
 	{
 		auto node = iter.id;
 		incProfit = pCost[node] * __numRRsets / __numV;
-		for (auto idx : __pHyperG->_vecRRsets[node])
+		for (auto idx : __pHyperG->_vecCover[node])
 		{
 			if (vecIntVst[idx] == 1) incProfit--;
 		}
@@ -645,7 +646,7 @@ std::vector<double> Alg::all_upper_bound_B(double* pCost, std::vector<int>& vecN
 			{
 				auto nodeId = __vecExtraLatticeEle[idx].id;
 				incProfit = -pCost[nodeId] * __numRRsets / __numV;
-				for (auto sampleIdx : __pHyperG->_vecRRsets[nodeId])
+				for (auto sampleIdx : __pHyperG->_vecCover[nodeId])
 				{
 					if (!vecBoolVst[sampleIdx]) incProfit++;
 				}
@@ -660,7 +661,7 @@ std::vector<double> Alg::all_upper_bound_B(double* pCost, std::vector<int>& vecN
 		{
 			auto seed = __vecExtraLatticeEle[extraSeedIdx - 1].id;
 			incProfit = -pCost[seed] * __numRRsets / __numV;
-			for (auto sampleIdx : __pHyperG->_vecRRsets[seed])
+			for (auto sampleIdx : __pHyperG->_vecCover[seed])
 			{
 				if (!vecBoolVst[sampleIdx])
 				{
@@ -692,12 +693,12 @@ std::vector<double> Alg::all_upper_bound_A(double* pCost, std::vector<int>& vecN
 	{
 		for (auto seed : __pRes->get_lower_lattice_vec())
 		{
-			for (auto idx : __pHyperG->_vecRRsets[seed]) vecBoolVst[idx] = true;
+			for (auto idx : __pHyperG->_vecCover[seed]) vecBoolVst[idx] = true;
 		}
 	}
 	for (auto seed : __vecSeed)
 	{
-		for (auto idx : __pHyperG->_vecRRsets[seed]) ++vecIntVst[idx];
+		for (auto idx : __pHyperG->_vecCover[seed]) ++vecIntVst[idx];
 	}
 	// Build the incremental profit to quit from B
 	double incProfit, baseMaxBound = 0;
@@ -705,7 +706,7 @@ std::vector<double> Alg::all_upper_bound_A(double* pCost, std::vector<int>& vecN
 	for (int node = 0; node < __numV; node++)
 	{
 		incProfit = -pCost[node] * __numRRsets / __numV;;
-		for (auto idx : __pHyperG->_vecRRsets[node])
+		for (auto idx : __pHyperG->_vecCover[node])
 		{
 			if (!vecBoolVst[idx]) incProfit++;
 		}
@@ -734,7 +735,7 @@ std::vector<double> Alg::all_upper_bound_A(double* pCost, std::vector<int>& vecN
 			{
 				auto seed = __vecSeed[seedIdx];
 				incProfit = pCost[seed] * __numRRsets / __numV;;
-				for (auto idx : __pHyperG->_vecRRsets[seed])
+				for (auto idx : __pHyperG->_vecCover[seed])
 				{
 					if (vecIntVst[idx] == 1) incProfit--;
 				}
@@ -750,7 +751,7 @@ std::vector<double> Alg::all_upper_bound_A(double* pCost, std::vector<int>& vecN
 		{
 			auto seed = __vecSeed[seedSize - 1];
 			incProfit = pCost[seed] * __numRRsets / __numV;
-			for (auto idx : __pHyperG->_vecRRsets[seed])
+			for (auto idx : __pHyperG->_vecCover[seed])
 			{
 				if (vecIntVst[idx] == 1) incProfit--;
 				--vecIntVst[idx];
@@ -803,11 +804,11 @@ void Alg::baseline_random() const
 	double maxProfit = -INFINITY, maxTotalCost = -1.0;
 	int seedSize = -1;
 	for (int i = 0; i < 11; i++)
-	{
+	{// Search the best seed size from n/2^i for i=0,1,...,10
 		double avgProfit = 0.0, avgTotalCost = 0.0;
 		int numSeed = __numV >> i;
 		for (int j = 0; j < 10; j++)
-		{
+		{// Repeat 10 times and take the average
 			random_shuffle(vecNode.begin(), vecNode.end());
 			std::vector<int> vecSeed(vecNode.begin(), vecNode.begin() + numSeed);
 			double totalCost = 0;
@@ -846,6 +847,7 @@ void Alg::baseline_highdegree() const
 		vecEle[i].id = i;
 		vecEle[i].value = (double)outDeg[i];
 	}
+	// Sort the node by its degree
 	sort(vecEle.begin(), vecEle.end(), greater());
 	std::vector<int> vecNode(__numV);
 	for (int i = 0; i < __numV; i++) vecNode[i] = vecEle[i].id;
@@ -853,7 +855,7 @@ void Alg::baseline_highdegree() const
 	double maxProfit = -INFINITY, maxTotalCost = -1.0;
 	std::vector<int> maxVecSeed;
 	for (int i = 0; i < 11; i++)
-	{
+	{// Search the best seed size from n/2^i for i=0,1,...,10
 		int numSeed = __numV >> i;
 		std::vector<int> vecSeed(vecNode.begin(), vecNode.begin() + numSeed);
 		totalCost = 0.0;
@@ -887,7 +889,7 @@ void Alg::baseline_infmax(const double epsilon, const int order, const bool isUn
 	std::vector<int> maxVecSeed;
 	int maxRR = 0;
 	for (int i = 0; i < 11; i++)
-	{
+	{// Search the best seed size from n/2^i for i=0,1,...,10
 		int numSeed = __numV >> i;
 		if (isUniBen) IMM(numSeed, epsilon, order);
 		else BCT(numSeed, epsilon, order);
@@ -927,7 +929,8 @@ void Alg::greedy(const int numRRsets, const int greedyType, const bool isPerfect
 	else double_greedy(isPerfectPrune, true);
 	__pRes->set_running_time(timerGreedy.get_total_time());
 	upper_bound();
-	auto infReal = __pHyperG->effic_inf_valid_algo(__vecSeed, 1e-3, 0.01);
+	//auto infReal = __pHyperG->effic_inf_valid_algo(__vecSeed, 1e-3, 0.01);
+	auto infReal = __pHyperG->inf_valid_algo(__vecSeed, 100000);
 	auto profit = infReal - __pRes->get_total_cost();
 	__pRes->set_profit(profit);
 	__pRes->set_RRsets_size(numRRsets);

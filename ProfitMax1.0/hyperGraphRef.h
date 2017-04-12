@@ -20,7 +20,7 @@ private:
 	{
 		__numV = static_cast<int>(_vecGRev.size());
 		for (auto& nbrs : _vecGRev) __numE += static_cast<int>(nbrs.size());
-		_vecRRsets = RRsets(__numV);
+		_vecCover = RRsets(__numV);
 		__vecVisitBool = std::vector<bool>(__numV);
 		__vecVisitNode = std::vector<int>(__numV);
 	}
@@ -28,10 +28,10 @@ private:
 public:
 	/// _vecGRev: reverse graph
 	const Graph& _vecGRev;
-	/// _vecRRsets: RR sets
-	RRsets _vecRRsets;
-	/// _vecRRsetsRev: reverse RR sets
-	RRsets _vecRRsetsRev;
+	/// _vecCover: forward cover sets, _vecCover[i] is the node sets that node i can reach
+	RRsets _vecCover;
+	/// _vecCoverRev: reverse cover sets, _vecCoverRev[i] is the node set that can reach node i
+	RRsets _vecCoverRev;
 
 	/// InfluModel: IC (independent cascade) and LT (liner threshold).
 	enum CascadeModel
@@ -55,7 +55,7 @@ public:
 		_cascadeModel = model;
 	}
 
-	/// Set RR sets model
+	/// Set RR sets model, record RR sets and the reversed RR sets if bilateral
 	void set_hyper_graph_mode(bool val)
 	{
 		__isBilateral = val;
@@ -115,7 +115,7 @@ public:
 		int numVisitNode = 0;
 		__que.clear();
 		__que.push_back(uStart);
-		_vecRRsets[uStart].push_back(hyperIdx);
+		_vecCover[uStart].push_back(hyperIdx);
 		assert(numVisitNode < __numV);
 		__vecVisitNode[numVisitNode++] = uStart;
 		__vecVisitBool[uStart] = true;
@@ -139,7 +139,7 @@ public:
 					__vecVisitBool[nbrId] = true;
 					__que.push_back(nbrId);
 					assert((int)_vecHyperGRev.size() > hyperIdx);
-					_vecRRsets[nbrId].push_back(hyperIdx);
+					_vecCover[nbrId].push_back(hyperIdx);
 				}
 			}
 			else if (_cascadeModel == LT)
@@ -155,11 +155,11 @@ public:
 				__vecVisitBool[nbrId] = true;
 				__que.push_back(nbrId);
 				assert((int)_vecHyperGRev.size() > hyperIdx);
-				_vecRRsets[nbrId].push_back(hyperIdx);
+				_vecCover[nbrId].push_back(hyperIdx);
 			}
 		}
 		for (int i = 0; i < numVisitNode; i++) __vecVisitBool[__vecVisitNode[i]] = false;
-		if (__isBilateral) _vecRRsetsRev.push_back(std::vector<int>(__vecVisitNode.begin(), __vecVisitNode.begin() + numVisitNode));
+		if (__isBilateral) _vecCoverRev.push_back(std::vector<int>(__vecVisitNode.begin(), __vecVisitNode.begin() + numVisitNode));
 	}
 
 	/// Evaluate the influence spread of a seed set on current generated RR sets
@@ -172,7 +172,7 @@ public:
 		vecBoolVst = std::vector<bool>(__numRRsets);
 		for (auto seed : vecSeed)
 		{
-			for (auto node : _vecRRsets[seed])
+			for (auto node : _vecCover[seed])
 			{
 				vecBoolVst[node] = true;
 			}
@@ -334,13 +334,13 @@ public:
 		{
 			for (int i = 0; i < __numRRsets; i++)
 			{
-				std::vector<int>().swap(_vecRRsetsRev[i]);
+				std::vector<int>().swap(_vecCoverRev[i]);
 			}
-			std::vector<std::vector<int>>().swap(_vecRRsetsRev);
+			std::vector<std::vector<int>>().swap(_vecCoverRev);
 		}
 		for (int i = 0; i < __numV; i++)
 		{
-			std::vector<int>().swap(_vecRRsets[i]);
+			std::vector<int>().swap(_vecCover[i]);
 		}
 		__numRRsets = 0;
 	}
@@ -351,11 +351,11 @@ public:
 		refresh_hypergraph();
 		if (__isBilateral)
 		{
-			std::vector<std::vector<int>>().swap(_vecRRsetsRev);
+			std::vector<std::vector<int>>().swap(_vecCoverRev);
 		}
 		std::vector<bool>().swap(__vecVisitBool);
 		std::vector<int>().swap(__vecVisitNode);
-		std::vector<std::vector<int>>().swap(_vecRRsets);
+		std::vector<std::vector<int>>().swap(_vecCover);
 	}
 };
 

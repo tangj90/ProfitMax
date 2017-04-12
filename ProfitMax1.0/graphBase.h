@@ -103,7 +103,7 @@ public:
 			std::ofstream outFileCost(filename + ".degree.cost");
 			for (auto deg : vecOutDeg)
 			{
-				outFileCost << 1.0 * deg * numV / numE << '\n';
+				outFileCost << std::fixed << 1.0 * deg * numV / numE << '\n';
 			}
 			outFileCost.close();
 		}

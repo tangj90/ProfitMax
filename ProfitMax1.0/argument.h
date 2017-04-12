@@ -4,7 +4,7 @@
 class Argument
 {
 public:
-	int _func = 1;
+	int _func = 1; // Function parameter. 0: format graph, 1: maximize profit, 2: format graph and then maximize profit
 	std::string _graphname = "facebook"; // Graph name. Default is "facebook".
 	/*
 	 * three letters: 
@@ -20,7 +20,7 @@ public:
 	std::string _probDist = "WC";// Probability distribution for diffusion model. Option: WC, TR. Default is WC.
 	std::string _benefitDist = "uniform";// Probability distribution for diffusion model. Option: WC, TR. Default is WC.
 	std::string _costDist = "degree"; // Cost type. Default is degree-proportional.
-	double _scale = 10; // Scale factor: the ratio between total cost and total benefit. Default is 10.
+	double _scale = 10.0; // Scale factor: the ratio between total cost and total benefit. Default is 10.
 	double _para = 0.0; // Cost parameter: the fraction of base cost. Default is 0 (pure degree-proportional).
 	double _eps = 0.5; // Error allowed for IMM/BCT. Default is 0.5.
 	//int _round = 0; // Number of rounds (for random algorithms). Default is 0.

@@ -25,16 +25,20 @@ int main(int argc, char* argv[])
 
 	std::cout << "---The Begin of " << Arg._outFileName << "---" << std::endl;
 	Timer mainTimer("main");
+	// Initialize a result object to record the results
 	PResult pResult(new TResult());
+	// Load the graph
 	Graph graph = GraphBase::load_graph(infilename, true, Arg._probDist);
 	if (Arg._model == TArgument::CascadeModel::LT)
-	{// Normalize the propagation probabilities in accumulation format
+	{// Normalize the propagation probabilities in accumulation format for LT cascade model for quickly generating RR sets
 		to_normal_accum_prob(graph);
 	}
 	int numV = (int)graph.size();
 	double* pCost;
+	// Load the cost of each node
 	pCost = TIO::read_cost(infilename, numV, Arg._costDist, Arg._scale, Arg._para);
-	double* pAccumWeight = nullptr;
+	//for (int i = 0; i < 20; i++) LogInfo(pCost[i]);
+	double* pAccumWeight = nullptr; // Used for non-uniform benefit distribution for activating nodes
 	bool isUniBen = true;
 	if (tolower(Arg._benefitDist[0]) == 'n')
 	{// Generate benefit weights for each node via normal distribution 
@@ -53,12 +57,12 @@ int main(int argc, char* argv[])
 		}
 		to_normal_accum_weight(pAccumWeight, numV);
 	}
+	// Create a hyper-graph object to generate/compute RR sets
 	PHyperGraphRef pHyperG(new THyperGraphRef(graph, pAccumWeight));
 	pHyperG->set_cascade_model(static_cast<THyperGraphRef::CascadeModel>(Arg._model));
 	pHyperG->set_hyper_graph_mode(true);
 	TAlg tAlg(pCost, pHyperG, pResult);
 	std::cout << "  ==>Graph loaded for RIS! total time used (sec): " + std::to_string(mainTimer.get_total_time()) << std::endl;
-	pHyperG->refresh_hypergraph();
 	dsfmt_gv_init_gen_rand(0);
 
 	switch (tolower(Arg._algName[0]))
@@ -83,7 +87,9 @@ int main(int argc, char* argv[])
 		// Double greedy algorithm
 		tAlg.greedy(Arg._numR, 1, Arg._isIterPrune);
 		break;
-	default: ;
+	default:
+		LogInfo("\nERROR! The input algorithm is invalid. Supported algorithms: random, highdegree, infmax, greedy and doublegreedy.");
+		return -1;
 	}
 	std::cout << ">>>Finished!\n" <<
 		"  ==>Time used for finding solution (sec): " + std::to_string(pResult->get_running_time()) << '\n' <<

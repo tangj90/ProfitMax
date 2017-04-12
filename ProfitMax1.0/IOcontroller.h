@@ -15,11 +15,11 @@ public:
 			outfile.write(reinterpret_cast<char*>(&res[0]), res.size());
 			outfile.close();
 			res.clear();
-			std::cout << "Succeed to save file: " << filename << '\n';
+			std::cout << "Save file successfully: " << filename << '\n';
 		}
 		else
 		{
-			std::cout << "Failed to save file: " + filename << '\n';
+			std::cout << "Save file failed: " + filename << '\n';
 			exit(1);
 		}
 	}
@@ -102,7 +102,7 @@ public:
 		std::string strScale = strs1.str();
 		strs2 << para;
 		std::string strPara = strs2.str();
-		return graphName + "_" + algName + "_" + costType + "_s" + strScale + "_b" + strPara;
+		return graphName + "_" + algName + "_" + costType + "_s" + strScale + "b" + strPara;
 	}
 
 	/// Print the results
@@ -127,7 +127,7 @@ public:
 		std::cout << "  |#Seeds: " << seedSize << std::endl;
 		std::cout << "  ||A*|: " << lowerLatticeSize << ", |B*|: " << max(-1, lowerLatticeSize + searchLatticeSize) << ", |B*\\A*|: " << searchLatticeSize << std::endl;
 		std::cout << "  |profit(A*)+profit(B*): " << profitLowerLattice + profitUpperLattice << std::endl;
-		std::cout << "  |#RRsets: " << RRsetsSize << std::endl;
+		std::cout << "  |#RR sets: " << RRsetsSize << std::endl;
 		std::cout << "   --------------------" << std::endl;
 		CreateDirectoryA(outFolder.c_str(), nullptr);
 		std::ofstream outFileNew(outFolder + "/" + "performance_" + outFileName);
@@ -146,7 +146,7 @@ public:
 			outFileNew << "|B*|: " << max(-1, lowerLatticeSize + searchLatticeSize) << '\n';
 			outFileNew << "|B*\\A*|: " << searchLatticeSize << '\n';
 			outFileNew << "profit(A*)+profit(B*): " << profitLowerLattice + profitUpperLattice << '\n';
-			outFileNew << "#RRsets: " << RRsetsSize << '\n';
+			outFileNew << "#RR sets: " << RRsetsSize << '\n';
 			outFileNew.close();
 		}
 	}

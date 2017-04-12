@@ -65,13 +65,7 @@
     <ClCompile Include="ProfitMax.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\SFMT\dSFMT\dSFMT.c">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="heap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="alg.cpp">
