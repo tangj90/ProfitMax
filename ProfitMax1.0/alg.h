@@ -34,6 +34,7 @@ public:
 		__numV = __pHyperG->get_nodes();
 		__numRRsets = __pHyperG->get_RRsets_size();
 	}
+
 	/// Build a set of n RR sets
 	void build_n_RRsets(int64 numRRsets);
 	/// Find the top-k seeds

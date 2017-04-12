@@ -11,7 +11,7 @@ public:
 	{
 		QueryPerformanceFrequency(&__TimeFreq);
 		QueryPerformanceCounter(&__StartTime);
-		__LastTime = __StartTime, __EndTime = __StartTime;
+		__LastTime = __StartTime , __EndTime = __StartTime;
 		__processName = "Unnamed";
 	}
 
@@ -19,7 +19,7 @@ public:
 	{
 		QueryPerformanceFrequency(&__TimeFreq);
 		QueryPerformanceCounter(&__StartTime);
-		__LastTime = __StartTime, __EndTime = __StartTime;
+		__LastTime = __StartTime , __EndTime = __StartTime;
 		__processName = processName;
 	}
 
@@ -27,7 +27,7 @@ public:
 	void refresh_time()
 	{
 		QueryPerformanceCounter(&__StartTime);
-		__LastTime = __StartTime, __EndTime = __StartTime;
+		__LastTime = __StartTime , __EndTime = __StartTime;
 	}
 
 	/// Record current time
@@ -58,7 +58,8 @@ public:
 	}
 
 	/// Get the total time from the beginning
-	double get_total_time() {
+	double get_total_time()
+	{
 		this->record_current_time();
 		return (double)(__EndTime.QuadPart - __StartTime.QuadPart) / __TimeFreq.QuadPart;
 	}
