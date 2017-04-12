@@ -1,5 +1,6 @@
 # ProfitMax
 This project is used to demonstrate the experiments for the paper: Jing Tang, Xueyan Tang, Junsong Yuan, "[Profit Maximization for Viral Marketing in Online Social Networks,](http://ieeexplore.ieee.org/document/7784445/)" in Proc. IEEE ICNP 2016.
+
 **Author: Jing Tang (Nanyang Technological University)**
 >Testing environment: Windows Visual Studio 2017.
 
@@ -15,19 +16,19 @@ Specify the direction for the input files, e.g., **-dir=graphInfo** *[default]*.
 - **-gname=string**
 	Specify the graph name to process, e.g., **-gname=facebook** *[default]*.
 - **-mode=string** *(works only when -func=0 or -func=2)*
-	Specify how to format the graph file with three letters. Two types of original graph file are supported. The file should have $$m+1$$ lines where the first line has two integers to indicate the number $$n$$ of nodes and the number $$m$$ of edges. The following $$m$$ lines list the edges. The node is indexed from $$0$$ to $$n-1$$. Each edge line has two integers to indicate the source node and target node. 
+	Specify how to format the graph file with three letters. Two types of original graph file are supported. The file should have $$m+1$$ lines where the first line has two integers to indicate the number $n$ of nodes and the number $$m$$ of edges. The following $$m$$ lines list the edges. The node is indexed from $$0$$ to $$n-1$$. Each edge line has two integers to indicate the source node and target node. 
 	+ **-mode=egr** *[default]*: Weighted Cascade (WC) model is used where $$p(u,v)=\frac{1}{indeg(v)}$$. For example,
-    >3 4
-    0 1
-    0 2
-    1 0
+    >3 4\
+    0 1\
+    0 2\
+    1 0\
     1 2
     
     + **-mode=ewr**: Each edge line can also follow with a positive number to indicate the edge weight (probability). In this case, the probability weight is associated by the given value. For example,
-    >3 4
-    0 1 0.2
-    0 2 0.3
-    1 0 0.1
+    >3 4\
+    0 1 0.2\
+    0 2 0.3\
+    1 0 0.1\
     1 2 0.4
 
 + The following options are valid for *-func=1* or *-func=2*.
