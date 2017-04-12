@@ -83,9 +83,10 @@ For example,
     
 - **-numR=integer**
 	
-    Specify the number of RR sets generated for the greedy algorithms. Default is *1,000,000*.
+    Specify the number of RR sets generated for the greedy algorithms. The default value is *1,000,000*.
     
 -  **-ptype=boolean**
-	Specify the graph name to process, Possible values:
+
+	Specify the graph name to process. Possible values:
 	+ **0** *[default]*: Iterative pruning approach is NOT used.
 	+ **1**: Iterative pruning approach is used.
