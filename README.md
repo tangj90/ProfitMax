@@ -2,7 +2,7 @@
 This project is used to demonstrate the experiments for the paper: Jing Tang, Xueyan Tang, Junsong Yuan, "[Profit Maximization for Viral Marketing in Online Social Networks,](http://ieeexplore.ieee.org/document/7784445/)" in Proc. IEEE ICNP 2016.
 
 **Author: Jing Tang (Nanyang Technological University)**
->Testing environment: Windows Visual Studio 2017.
+>Development platform: Windows Visual Studio 2017.
 
 Execute the command: `ProfitMaxV1.0.exe [options]`
 
