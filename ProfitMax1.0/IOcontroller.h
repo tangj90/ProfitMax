@@ -50,7 +50,7 @@ public:
 	}
 
 	/// Save graph structure to a file
-	static void IOcontroller::save_graph_struct(std::string graphName, const Graph& vecGraph, const bool isReverse)
+	static void save_graph_struct(std::string graphName, const Graph& vecGraph, const bool isReverse)
 	{
 		std::string postfix = ".vec.graph";
 		if (isReverse) postfix = ".vec.rvs.graph";
@@ -59,7 +59,7 @@ public:
 	}
 
 	/// Load graph structure from a file
-	static void IOcontroller::load_graph_struct(std::string graphName, Graph& vecGraph, const bool isReverse)
+	static void load_graph_struct(std::string graphName, Graph& vecGraph, const bool isReverse)
 	{
 		std::string postfix = ".vec.graph";
 		if (isReverse) postfix = ".vec.rvs.graph";
@@ -68,7 +68,7 @@ public:
 	}
 
 	/// Load cost of each node from a file
-	static double* IOcontroller::read_cost(std::string graphName, int numV, std::string costType, double scale, double base)
+	static double* read_cost(std::string graphName, int numV, std::string costType, double scale, double base)
 	{
 		std::string fullName = graphName + "." + costType + ".cost";
 		double *cost, val;
@@ -95,7 +95,7 @@ public:
 	}
 
 	/// Get out-file name
-	static std::string IOcontroller::get_out_file_name(std::string graphName, std::string costType, std::string algName, double scale, double para)
+	static std::string get_out_file_name(std::string graphName, std::string costType, std::string algName, double scale, double para)
 	{
 		std::ostringstream strs1, strs2;
 		strs1 << scale;
@@ -106,7 +106,7 @@ public:
 	}
 
 	/// Print the results
-	static void IOcontroller::write_result(std::string outFileName, PResult resultObj, std::string outFolder)
+	static void write_result(std::string outFileName, PResult resultObj, std::string outFolder)
 	{
 		double runTime = resultObj->get_running_time();
 		double profit = resultObj->get_profit();
@@ -152,7 +152,7 @@ public:
 	}
 
 	/// Print the seeds
-	static void IOcontroller::write_order_seeds(std::string outFileName, PResult resultObj, std::string outFolder)
+	static void write_order_seeds(std::string outFileName, PResult resultObj, std::string outFolder)
 	{
 		CreateDirectoryA(outFolder.c_str(), nullptr);
 		auto vecSeed = resultObj->get_seed_vec();
