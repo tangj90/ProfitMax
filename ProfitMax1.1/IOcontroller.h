@@ -132,6 +132,8 @@ public:
 		int seedSize = resultObj->get_seed_size(), lowerLatticeSize = resultObj->get_lower_lattice_size();
 		int searchLatticeSize = resultObj->get_search_lattice_size();
 		int RRsetsSize = resultObj->get_RRsets_size();
+		auto upperLatticeSize = lowerLatticeSize + searchLatticeSize;
+		upperLatticeSize = -1 > upperLatticeSize ? -1 : upperLatticeSize;
 		std::cout << "   --------------------" << std::endl;
 		std::cout << "  |Time (sec): " << runTime << std::endl;
 		std::cout << "  |Profit: " << profit << std::endl;
@@ -140,7 +142,7 @@ public:
 		std::cout << "  |Upper bound mu_1 via USM: " << vecBound[4] << std::endl;
 		std::cout << "  |Cost: " << totalCost << std::endl;
 		std::cout << "  |#Seeds: " << seedSize << std::endl;
-		std::cout << "  ||A*|: " << lowerLatticeSize << ", |B*|: " << max(-1, lowerLatticeSize + searchLatticeSize) << ", |B*\\A*|: " << searchLatticeSize << std::endl;
+		std::cout << "  ||A*|: " << lowerLatticeSize << ", |B*|: " << upperLatticeSize << ", |B*\\A*|: " << searchLatticeSize << std::endl;
 		std::cout << "  |profit(A*)+profit(B*): " << profitLowerLattice + profitUpperLattice << std::endl;
 		std::cout << "  |#RR sets: " << RRsetsSize << std::endl;
 		std::cout << "   --------------------" << std::endl;
@@ -158,7 +160,7 @@ public:
 			outFileNew << "total cost: " << totalCost << '\n';
 			outFileNew << "seed size: " << seedSize << '\n';
 			outFileNew << "|A*|: " << lowerLatticeSize << '\n';
-			outFileNew << "|B*|: " << max(-1, lowerLatticeSize + searchLatticeSize) << '\n';
+			outFileNew << "|B*|: " << upperLatticeSize << '\n';
 			outFileNew << "|B*\\A*|: " << searchLatticeSize << '\n';
 			outFileNew << "profit(A*)+profit(B*): " << profitLowerLattice + profitUpperLattice << '\n';
 			outFileNew << "#RR sets: " << RRsetsSize << '\n';

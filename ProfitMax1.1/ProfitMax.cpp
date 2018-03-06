@@ -53,7 +53,7 @@ int main(int argc, char* argv[])
 		pAccumWeight = (double *)malloc(numV * sizeof(double));
 		for (int i = 0; i < numV; i++)
 		{
-			pAccumWeight[i] = max(0, distribution(generator));
+			pAccumWeight[i] = 0 > distribution(generator) ? 0 : distribution(generator);
 		}
 		to_normal_accum_weight(pAccumWeight, numV);
 	}

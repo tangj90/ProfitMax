@@ -201,7 +201,7 @@ void Alg::supergradient1()
 		{
 			if (vecIntVst[idx] == 1) incProfit--;
 		}
-		maxBound += max(0, incProfit);
+		maxBound += 0 > incProfit ? 0 : incProfit;
 	}
 	for (auto iter : __vecExtraLatticeEle)
 	{
@@ -210,7 +210,7 @@ void Alg::supergradient1()
 		{
 			if (!vecBoolVst[idx]) incProfit++;
 		}
-		maxBound += max(0, incProfit);
+		maxBound += 0 > incProfit ? 0 : incProfit;
 	}
 	maxBound = maxBound * __numV / __numRRsets + __pRes->get_profit_org();
 	__pRes->set_profit_bound_idx(maxBound, 2);
@@ -240,7 +240,7 @@ void Alg::supergradient2()
 		{
 			if (vecIntVst[idx] == 1) incProfit--;
 		}
-		maxBound += max(0, incProfit);
+		maxBound += 0 > incProfit ? 0 : incProfit;
 	}
 	for (auto iter : __vecExtraLatticeEle)
 	{
@@ -249,7 +249,7 @@ void Alg::supergradient2()
 		{
 			if (!vecBoolVst[idx]) incProfit++;
 		}
-		maxBound += max(0, incProfit);
+		maxBound += 0 > incProfit ? 0 : incProfit;
 	}
 	maxBound = maxBound * __numV / __numRRsets + __pRes->get_profit_org();
 	__pRes->set_profit_bound_idx(maxBound, 3);
@@ -537,8 +537,8 @@ void Alg::double_greedy(bool isPerfectPrune, bool isDeter)
 		}
 		else
 		{
-			incProfitS = max(0, incProfitS);
-			incProfitT = max(0, incProfitT);
+			incProfitS = 0 > incProfitS ? 0 : incProfitS;
+			incProfitT = 0 > incProfitT ? 0 : incProfitT;
 			if (incProfitS + incProfitT < 1e-8)
 			{
 				prob = 1;
@@ -630,7 +630,7 @@ std::vector<double> Alg::all_upper_bound_B(double* pCost, std::vector<int>& vecN
 	// Find the optimum
 	for (auto seed : __vecSeed)
 	{
-		baseMaxBound += max(0, vecIncProfitB[seed]);
+		baseMaxBound += 0 > vecIncProfitB[seed] ? 0 : vecIncProfitB[seed];
 	}
 	baseMaxBound += __pRes->get_profit_org() * __numRRsets / __numV;
 	int counter = 0, currSize = 0;
@@ -648,7 +648,7 @@ std::vector<double> Alg::all_upper_bound_B(double* pCost, std::vector<int>& vecN
 				{
 					if (!vecBoolVst[sampleIdx]) incProfit++;
 				}
-				maxBound += max(0, incProfit);
+				maxBound += 0 > incProfit ? 0 : incProfit;
 			}
 			vecResult[sizeResult - currSize] = maxBound * __numV / __numRRsets;
 			if (currSize == remainder) step--;
@@ -668,7 +668,7 @@ std::vector<double> Alg::all_upper_bound_B(double* pCost, std::vector<int>& vecN
 				}
 			}
 			baseMaxBound += incProfit; // The incremental profit of the last node 
-			baseMaxBound += max(0, vecIncProfitB[seed]); // The incremental profit of quiting from B
+			baseMaxBound += 0 > vecIncProfitB[seed] ? 0 : vecIncProfitB[seed]; // The incremental profit of quiting from B
 			counter++;
 		}
 	}
@@ -714,11 +714,11 @@ std::vector<double> Alg::all_upper_bound_A(double* pCost, std::vector<int>& vecN
 	for (auto iter : __vecExtraLatticeEle)
 	{
 		auto node = iter.id;
-		baseMaxBound += max(0, vecIncProfitA[node]);
+		baseMaxBound += 0 > vecIncProfitA[node] ? 0 : vecIncProfitA[node];
 	}
 	for (auto node : vecNonOptimal)
 	{
-		baseMaxBound += max(0, vecIncProfitA[node]);
+		baseMaxBound += 0 > vecIncProfitA[node] ? 0 : vecIncProfitA[node];
 	}
 	baseMaxBound += __pRes->get_profit_org() * __numRRsets / __numV;
 
@@ -737,7 +737,7 @@ std::vector<double> Alg::all_upper_bound_A(double* pCost, std::vector<int>& vecN
 				{
 					if (vecIntVst[idx] == 1) incProfit--;
 				}
-				maxBound += max(0, incProfit);
+				maxBound += 0 > incProfit ? 0 : incProfit;
 			}
 			//LogInfo(maxBound * __numV / __RRsetsSize);
 			vecResult[sizeResult - currSize] = maxBound * __numV / __numRRsets;
@@ -755,7 +755,7 @@ std::vector<double> Alg::all_upper_bound_A(double* pCost, std::vector<int>& vecN
 				--vecIntVst[idx];
 			}
 			baseMaxBound += incProfit; // The incremental profit of the last node 
-			baseMaxBound += max(0, vecIncProfitA[seed]); // The incremental profit of adding into A
+			baseMaxBound += 0 > vecIncProfitA[seed] ? 0 : vecIncProfitA[seed]; // The incremental profit of adding into A
 			counter++;
 		}
 	}
@@ -907,7 +907,7 @@ void Alg::baseline_infmax(const double epsilon, const int order, const bool isUn
 			maxVecSeed = __vecSeed;
 		}
 		auto numRR = __pHyperG->get_RRsets_size();
-		maxRR = max(maxRR, (int)numRR);
+		maxRR = maxRR > (int)numRR ? maxRR : (int)numRR;
 		__pHyperG->refresh_hypergraph();
 	}
 	__pRes->set_running_time(timerIM.get_total_time());

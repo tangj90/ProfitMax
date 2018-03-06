@@ -15,10 +15,8 @@
 
 
 // TODO: reference additional headers your program requires here
-#if defined(_MSC_VER) || defined(__BORLANDC__)
-#if !defined(DSFMT_UINT32_DEFINED) && !defined(SFMT_UINT32_DEFINED)
-typedef __int64 int64;
-#endif
+#ifndef int64
+typedef long long int64;
 #endif
 
 #include <iostream>
