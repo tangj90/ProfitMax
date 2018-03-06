@@ -65,10 +65,10 @@
     <ClCompile Include="ProfitMax.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\SFMT\dSFMT\dSFMT.c">
+    <ClCompile Include="alg.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="alg.cpp">
+    <ClCompile Include="SFMT\dSFMT\dSFMT.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

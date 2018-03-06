@@ -31,7 +31,7 @@ typedef __int64 int64;
 #include <functional>
 #include <math.h>
 
-#include "dSFMT.h"
+#include "SFMT/dSFMT/dSFMT.h"
 #include "timer.h"
 #include "commonStruct.h"
 #include "commonFunc.h"

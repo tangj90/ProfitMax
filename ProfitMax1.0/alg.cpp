@@ -1,6 +1,4 @@
 #include "stdafx.h"
-#include "alg.h"
-
 
 void Alg::refresh_params()
 {
